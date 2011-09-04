@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Anti-Modal Demo</title>
+	
+	<meta name="generator" content="TextMate http://macromates.com/">
+	<meta name="author" content="luis buenaventura (@helloluis), infinite.ly">
+	<script language="Javascript" src="jquery.1.6.2.min.js"></script>
+	<script language="Javascript" src="jquery.antimodal.js"></script>
+	<link rel="stylesheet" href="stylesheets/reset_h5bp.css">
+	<link rel="stylesheet" href="stylesheets/antidialog_demo.css">
+	
+</head>
+<body>
+<h1>The Anti-Modal</h1>
+<h3>An alternative lightbox / dialog plugin for jQuery</h3>
+<p>Written by <a href="http://twitter.com/helloluis">@helloluis</a></p>
+<dl class="main">
+<dt class="section_title">The Main Problem</dt>
+<dd class="section_content"><p>The Anti-Modal is a jQuery plugin that allows full page takeovers for content that is too important/verbose to be put in a regular dialog or modal box. Too often, modal boxes are misused in websites by popping them over content and then either a) being so big that they cover more than 80% of the page, or b) having too much content and then resorting to in-modal scrolling, or c) preventing the user from interacting with/viewing other page elements while the modal is active.</p>
+<p>For situations (a) and (b), conventional modals are weak solutions. If you're going to show a page's worth of content, you should really be displaying it in a page, not a modal. And if your modal is so big that it covers most of the page, shouldn't it just cover <strong>all</strong> of the page? It's not as if your user could do anything else anyway. (I'm looking at you, Facebook Photo Slideshow.)</p>
+<p>For situation (c), it mostly comes down to design strategy and is a much deeper discussion altogether. One of the main reasons modals are such a weak solution is because it obfuscates more information than it illuminates. Consider the most common modal usage scenario, that of the photo album. Once you've opened up the modal, you can no longer see the other photos in the album, so the act of browsing is severely hampered. It becomes increasingly difficult to jump from one photo to another that isn't directly adjacent. You either keep flicking to the next photo until you find the one you want, or you close the modal, scroll around, then open the modal again. You also lose the sense of where you are in the sequence of photos (unless your modal designer was smart enough to have a navigation aid declaring your position, e.g., "3 of 10," and even that is a poor solution IMHO; it would ultimately be unnecessary if the album had remained in view).</p>
+<p>But I digress.</p>
+</dd>
+
+<dt class="section_title">The Working Solution</dt>
+<dd class="section_content"><p>The Anti-Modal attempts to address situations (a) and (b), by following the pattern of the well-known Lightbox javascript plugin, but by creating a full takeover instead of a floating div. The takeover will smartly take its styling from the main page (its background style, primarily), and slide in the new pseudo-page from the right (or left, depending on preference).</p>
+</dd>
+
+<dt class="section_title">Basic Usage</dt>
+<dd class="section_content"><p>Anti-Modal is primarily used for lists of content, with the default scenario being definition-lists &lt;dl&gt;. In a standard &lt;dl&gt;, applying Anti-Modal would do the following:</p>
+  <ol>
+    <li>Hide all &lt;dd&gt; elements.</li>
+    <li>Add click events to all &lt;dt&gt; elements.</li>
+    <li>Generate an empty div with id "antimodal" and class "jquery-ui-antimodal-container" at the bottom of the &lt;body&gt;.</li>
+  </ol>
+  <p>All of these items can be fine-tuned, with the configuration options below. In its simplest form, the Anti-Modal call looks like this:</p>
+  <code>
+    $(function(){
+      $("#gallery").antimodal();
+    });
+  </code>
+  In the example above, $("#gallery") selects a list (either a &lt;ol&gt;, &lt;ul&gt;, or &lt;dl&gt;), finds the elements inside each list-item that could serve as buttons or content, and rejigs the DOM to get ready for the user's first click. If you want to see antimodal at work on this demo page, <a href="#!" class="antimodal_demo_button">click here</a>. For reference,
+  the markup looks like this:
+  <iframe class="markup_example">
+    <p class="demo_markup_abbreviated"></p>
+    <p class="demo_script_abbreviated"></p>
+  </iframe>
+</dd>
+
+<dt class="section_title">One-Off Usage</dt>
+<dd class="section_content">
+  <p>For situations where no lists are present, but you still want to use Anti-Modal for its virtual page creator, you can use it with any non-list DOM element, thusly:
+</p>
+<code>
+  $("div#section").antimodal({ 
+    buttonClass  : ".section_title", 
+    contentClass : ".section_content" 
+  });
+</code>
+<p>In the example above, the <strong>#section</strong> div has an element with class <strong>section_title</strong> within it, and another element with class <strong>section_content</strong>. Enabling Anti-Modal on this will turn the section_title element into a clickable button, and hide the section_content element until the user clicks.</p>
+</dd>
+
+<dt class="section_title">Options</dt>
+<dd class="section_content">
+  <p>A bunch of configuration options are available:</p>
+  <code>
+    $("#gallery").antimodal({
+      autoOpen       : false,
+      slideFrom      : "left",
+      cover          : 50,
+      resizable      : false,
+      takeover       : "body",
+      buttonClass    : ".section_title",
+      contentClass   : ".section_content",
+      containerClass : ".antimodal_container"
+    });
+  </code>
+  
+  <dl class="parameters">
+
+    <dt class="parameter_name"><strong>slideFrom</strong></dt>
+    <dd><p class="parameter_values">Possible: <em>"left" or "right"</em><br /> Default : <em>"right"</em></p>
+      <p class="parameter_description">The pseudo-page animates from either the right or left, covering 95% of the current page. The remaining 5% is left as a cancellation area so that the user can jump back to the original view by clicking blindly. (The exact proportion can be adjusted in the subsequent parameter).</p>
+    </dd>
+
+    <dt class="parameter_name"><strong>cover</strong></dt>
+    <dd><p class="parameter_values">Possible: <em>Integer between 10 and 100</em><br /> Default : <em>95</em></p>
+      <p class="parameter_description">If the parameter is 10, only 10% of the main page will be covered. If the pseudo page's 'cover' parameter is set at 100, no cancellation area will be visible. The cancellation area will always have a width equal to (100-x), where x is the value of 'cover'.</p>
+    </dd>
+
+    <dt class="parameter_name"><strong>resizable</strong></dt>
+    <dd><p class="parameter_values">Possible: <em>Boolean</em><br />Default : <em>false</em></p>
+      <p class="parameter_description">In some cases, you may want to allow the user the ability to push or pull the pseudo-page to alter its size. If set to true, a new div with classes "ui-resizable-handle ui-icon ui-icon-triangle-2-e-w" will be added to the edge of the pseudo-page, which the user can drag. If you are already using jQuery UI, the element will be styled automatically. If not, you'll need to write your own style for it.</p>
+    </dd>
+
+    <dt class="parameter_name"><strong>takeover</strong></dt>
+    <dd><p class="parameter_values">Possible: <em>any valid jQuery selector</em><br /> Default : <em>body</em></p>
+      <p class="parameter_description"></p>
+    </dd>
+    
+    <dt class="parameter_name"><strong>buttonClass</strong></dt>
+    <dd><p class="parameter_values">Possible: <em>any valid jQuery selector</em><br /> Default : <em>dt</em>, but if given an "li", will look for "h<em>X</em>" elements to turn into buttons.</p>
+      <p class="parameter_description"></p>
+    </dd>
+
+    <dt class="parameter_name"><strong>contentClass</strong></dt>
+    <dd><p class="parameter_values">Possible: <em>any valid jQuery selector</em><br /> Default : <em>dd</em>, but if given an "li", will look for a non-"h<em>X</em>" element to turn into content.</p>
+      <p class="parameter_description"></p>
+    </dd>
+    
+    <dt class="parameter_name"><strong>cloneBackground</strong></dt>
+    <dd><p class="parameter_values">Possible: <em>Boolean</em><br /> Default : <em>true</em></p>
+      <p class="parameter_description">If set to <em>true</em>, will attempt to copy the background styling of the element defined in <strong>takeover</strong> (by default, this is the "body" of the page).</p>
+    </dd>
+
+  </dl>
+</dd>
+</dl>
+
+<script>
+
+// Behaviours for this Demo Page
+
+$(function(){
+  // add behaviours for the demo-runner
+  $(".antimodal_demo_button").click(function(){
+    $("dl.main").antimodal({
+      contentClass : ".section_title",
+      buttonClass  : ".section_content"
+    });
+  });
+  $(".antimodal_demo_cancel").click(function(){
+    $("dl.main").antimodal("destroy");
+  });
+  
+  // recursively grab the markup of dl.main, and place it in
+  // the reference iframe so the user can see the structure
+  var abbreviated_markup = $("dl.main").clone();
+  $("dd",abbreviated_markup).each(function(){
+    $(this).text( $(this).text().substr(0, 15) + " ..." );
+  });
+  
+  $(".demo_markup_abbreviated").html( abbreviated_markup.replace("<","&lt;").replace("&gt;",">") );
+});
+</script>
+</body>
+</html>

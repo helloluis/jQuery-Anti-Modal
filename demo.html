@@ -8,8 +8,8 @@
 	
 	<meta name="generator" content="TextMate http://macromates.com/">
 	<meta name="author" content="luis buenaventura (@helloluis), infinite.ly">
-	<script language="Javascript" src="jquery.1.6.2.min.js"></script>
-	<script language="Javascript" src="jquery.antimodal.js"></script>
+	<script language="Javascript" src="javascripts/jquery.1.6.2.min.js"></script>
+	<script language="Javascript" src="javascripts/jquery.antimodal.js"></script>
 	<link rel="stylesheet" href="stylesheets/reset_h5bp.css">
 	<link rel="stylesheet" href="stylesheets/antidialog_demo.css">
 	
@@ -18,7 +18,8 @@
 <h1>The Anti-Modal</h1>
 <h3>An alternative lightbox / dialog plugin for jQuery</h3>
 <p>Written by <a href="http://twitter.com/helloluis">@helloluis</a></p>
-<dl class="main">
+<div class="container">
+<dl class="sections">
 <dt class="section_title">The Main Problem</dt>
 <dd class="section_content"><p>The Anti-Modal is a jQuery plugin that allows full page takeovers for content that is too important/verbose to be put in a regular dialog or modal box. Too often, modal boxes are misused in websites by popping them over content and then either a) being so big that they cover more than 80% of the page, or b) having too much content and then resorting to in-modal scrolling, or c) preventing the user from interacting with/viewing other page elements while the modal is active.</p>
 <p>For situations (a) and (b), conventional modals are weak solutions. If you're going to show a page's worth of content, you should really be displaying it in a page, not a modal. And if your modal is so big that it covers most of the page, shouldn't it just cover <strong>all</strong> of the page? It's not as if your user could do anything else anyway. (I'm looking at you, Facebook Photo Slideshow.)</p>
@@ -45,22 +46,22 @@
   </code>
   In the example above, $("#gallery") selects a list (either a &lt;ol&gt;, &lt;ul&gt;, or &lt;dl&gt;), finds the elements inside each list-item that could serve as buttons or content, and rejigs the DOM to get ready for the user's first click. If you want to see antimodal at work on this demo page, <a href="#!" class="antimodal_demo_button">click here</a>. For reference,
   the markup looks like this:
-  <iframe class="markup_example">
+  <code class="markup_example">
     <p class="demo_markup_abbreviated"></p>
     <p class="demo_script_abbreviated"></p>
-  </iframe>
+  </code>
 </dd>
 
 <dt class="section_title">One-Off Usage</dt>
 <dd class="section_content">
   <p>For situations where no lists are present, but you still want to use Anti-Modal for its virtual page creator, you can use it with any non-list DOM element, thusly:
 </p>
-<code>
-  $("div#section").antimodal({ 
-    buttonClass  : ".section_title", 
-    contentClass : ".section_content" 
-  });
-</code>
+  <code>
+    $("div#section").antimodal({ 
+      buttonClass  : ".section_title", 
+      contentClass : ".section_content" 
+    });
+  </code>
 <p>In the example above, the <strong>#section</strong> div has an element with class <strong>section_title</strong> within it, and another element with class <strong>section_content</strong>. Enabling Anti-Modal on this will turn the section_title element into a clickable button, and hide the section_content element until the user clicks.</p>
 </dd>
 
@@ -94,7 +95,7 @@
 
     <dt class="parameter_name"><strong>resizable</strong></dt>
     <dd><p class="parameter_values">Possible: <em>Boolean</em><br />Default : <em>false</em></p>
-      <p class="parameter_description">In some cases, you may want to allow the user the ability to push or pull the pseudo-page to alter its size. If set to true, a new div with classes "ui-resizable-handle ui-icon ui-icon-triangle-2-e-w" will be added to the edge of the pseudo-page, which the user can drag. If you are already using jQuery UI, the element will be styled automatically. If not, you'll need to write your own style for it.</p>
+      <p class="parameter_description">In some cases, you may want to allow the user the ability to push or pull the pseudo-page to alter its size. If set to true, a new div with classes <strong>"ui-resizable-handle ui-icon ui-icon-triangle-2-e-w"</strong> will be added to the edge of the pseudo-page, which the user can drag. If you are already using jQuery UI, the element will be styled automatically. If not, you'll need to write your own style for it.</p>
     </dd>
 
     <dt class="parameter_name"><strong>takeover</strong></dt>
@@ -119,7 +120,12 @@
 
   </dl>
 </dd>
+<dt class="section_title">Contribute</dt>
+<dd class="section_content">
+  <p>You can contribute to or fork this at <a href="http://github.com/helloluis/jQuery-Anti-Modal" target="_blank">http://github.com/helloluis/jQuery-Anti-Modal</a></p>
+</div>
 </dl>
+</div>
 
 <script>
 
@@ -128,23 +134,25 @@
 $(function(){
   // add behaviours for the demo-runner
   $(".antimodal_demo_button").click(function(){
-    $("dl.main").antimodal({
-      contentClass : ".section_title",
-      buttonClass  : ".section_content"
+    $("dl.sections").antimodal({
+      buttonClass : ".section_title",
+      contentClass  : ".section_content"
     });
   });
   $(".antimodal_demo_cancel").click(function(){
-    $("dl.main").antimodal("destroy");
+    $("dl.sections").antimodal("destroy");
   });
   
   // recursively grab the markup of dl.main, and place it in
   // the reference iframe so the user can see the structure
-  var abbreviated_markup = $("dl.main").clone();
+  var abbreviated_markup = $(".container").clone();
   $("dd",abbreviated_markup).each(function(){
     $(this).text( $(this).text().substr(0, 15) + " ..." );
   });
   
-  $(".demo_markup_abbreviated").html( abbreviated_markup.replace("<","&lt;").replace("&gt;",">") );
+  // $(".demo_markup_abbreviated").text( abbreviated_markup.html().replace(/</gi,"&lt;").replace(/>/gi,"&gt;") );
+  $(".demo_markup_abbreviated").text( abbreviated_markup.html() );
+  
 });
 </script>
 </body>

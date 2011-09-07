@@ -86,8 +86,8 @@
     buttonClass     : "dt",
     contentClass    : "dd",
     takeover        : "body",
-    contID          : "antimodal_container",
-    contClass       : "antimodal",
+    containerID     : "antimodal_container",
+    containerClass  : "antimodal",
     slideFrom       : "right",
     cloneBackground : true,
     resizable       : false,
@@ -98,12 +98,14 @@
     _init : function() {
       
     },
+    
     _create : function( options ) {
       
       this.options = $.extend( true, {}, $.AntiModal.settings, options );
       
-      this.opened = false;
-
+      this.opened  = false;
+      
+      var anti     = this;
       // initialize all the necessary vars for building our antimodal container
       var buttons  = anti.options.buttonClass, 
         contents   = anti.options.contentClass, 
@@ -115,7 +117,7 @@
         width      = $(takeover).outerWidth() * cover/100,
         height     = $(window).height() > $(takeover).outerHeight() ? $(window).height() : $(takeover).outerHeight(),
         clone_bg   = anti.options.cloneBackground,
-        zindex     = $(takeover).findHighestZIndex()+2;
+        zindex     = $(takeover).findHighestZindex()+2;
 
       if (clone_bg===true) {
         var background_style = [ $(takeover).css("backgroundColor"), 
@@ -178,8 +180,8 @@
       }
       
       // add button click behaviours
-      $(buttons).click(function(){
-        var content = $(this).html() + $(this).next(contents).html();
+      $(buttons).css("cursor","pointer").click(function(){
+        var content = $(this).clone() + $(this).next(contents).html();
         cont.html( content );
       })
       

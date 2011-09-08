@@ -4,4 +4,19 @@ Written by @helloluis
 The Anti-Modal is a jQuery plugin that allows full page takeovers for content 
 that is too important/verbose to be put in a regular dialog or modal box. 
 
+===================================================================
+|                                                                 |
+| The Main Thought Process:                                       |
+| *What constitutes a misuse of the modal window (or lightbox)?*  |
+|                                                                 |
+===================================================================
+
+One would argue that the following situations are all misuses:
+
+1) The modal contains so much content that it scrolls.
+2) The modal is so large that it covers over 80% of the page.
+3) The modal doesn't indicate your position in a sequence (1 of 8 photos, e.g.).
+
+In situations 1) and 2), modals are the wrong solution, because if either the modal or the content it contains is as large as the page itself, then it probably deserves its own page. You want something that loads instantly (i.e., isn't a new page request), but acts like a page.
+
 http://github.com/helloluis/jQuery-Anti-Modal

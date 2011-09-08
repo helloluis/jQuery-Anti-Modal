@@ -8,7 +8,7 @@
 
   - project started 2011-09-03
   - plugin pattern pilfered from @desandro's Masonry
-  - uses the mini-plugins 'smartresize' and 'findHighestZIndex', courtesy of their respective authors
+  - uses the mini-plugin 'smartresize', courtesy of respective author
 
 */
 
@@ -52,26 +52,7 @@
   $.fn.smartresize = function( fn ) {
     return fn ? this.bind( "smartresize", fn ) : this.trigger( "smartresize", ["execAsap"] );
   };
-  
-  /*
-    findHighestZindex 
-    http://plugins.jquery.com/users/yeblon
-  */
-  
-  $.fn.findHighestZindex = function() {  
-		var element = this;  
-		var allObjects = $(element);
-		var allObjectsArray = $.makeArray(allObjects);
-		var zIndexArray = [0]; 
-		var largestZindex = 0;
-		for (var i = 0; i < allObjectsArray.length; i++) {
-				var zIndex = $(allObjectsArray[i]).css('z-index');
-				zIndexArray.push(zIndex);
-		}
-		var largestZindex = Math.max.apply(Math, zIndexArray);
-		return largestZindex;
-	};
-  
+
   
   // our "Widget" object constructor
   $.AntiModal = function( options, element ){
@@ -91,7 +72,9 @@
     slideFrom       : "right",
     cloneBackground : true,
     resizable       : false,
-    cover           : 95
+    cover           : 95,
+    animate         : true,
+    animation_duration : 800
   };
   
   $.AntiModal.prototype = {
@@ -117,8 +100,13 @@
         width      = $(takeover).outerWidth() * cover/100,
         height     = $(window).height() > $(takeover).outerHeight() ? $(window).height() : $(takeover).outerHeight(),
         clone_bg   = anti.options.cloneBackground,
-        zindex     = $(takeover).findHighestZindex()+2;
-
+        maxZ       = Math.max.apply(null,$.map($(takeover + ' > *'), function(e,n){
+                       return( $(e).css('position')=='absolute' ? parseInt($(e).css('z-index')) : 1 );
+                     })),
+        zindex     = maxZ+2;
+      
+      this.takeover = takeover;
+      
       if (clone_bg===true) {
         var background_style = [ $(takeover).css("backgroundColor"), 
                                   $(takeover).css("backgroundImage"), 
@@ -128,18 +116,24 @@
         var background_style = "rgba(0,0,0,0.4)";
       }
 
+      var content_cont = this.content_cont = $("<div class='antidialog_content_container'></div>").
+        css({
+          "margin" : "10px",
+          "padding" : "10px"
+        });
+
       // build the antimodal container, appending it to the takeover target, then hiding it for later use
       var cont = this.cont = $("<div id='" + cont_id + "' class='" + cont_class + "'></div>").
         css({ 
           "position"   : "absolute",
-          "z-index"    : zindex,
+          "zIndex"     : zindex,
           "top"        : "0px",
           "left"       : ($(takeover).outerWidth() + 1) + "px",
           "background" : background_style,
           "width"      : width + "px",
           "height"     : height + "px"
         }).
-        html("<div class='antidialog_content_container'></div>").
+        html( content_cont ).
         appendTo(takeover).
         hide();
       
@@ -155,12 +149,15 @@
       var cancellor = this.cancellor = $("<div id='antidialog_cancellor'></div>").
         css({
           "position"        : "absolute",
-          "z-index"         : zindex-1,
+          "zIndex"          : zindex-1,
           "background"      : "rgba(0,0,0,0.5)",
           "top"             : "0px",
           "left"            : "0px",
           "width"           : $(takeover).outerWidth(),
           "height"          : $(window).height() > $(takeover).outerHeight() ? $(window).height() : $(takeover).outerHeight()
+        }).
+        click(function(){
+          anti.hidePage();
         }).
         appendTo(takeover).
         hide();
@@ -181,8 +178,8 @@
       
       // add button click behaviours
       $(buttons).css("cursor","pointer").click(function(){
-        var content = $(this).clone() + $(this).next(contents).html();
-        cont.html( content );
+        var content = $(this).clone().html() + $(this).next(contents).html();
+        anti.showPage(content);
       })
       
       // hide content items
@@ -191,8 +188,23 @@
     },
     showPage : function( content ) {
       if (this.opened===false) {
-        this.cont.html( content ).animate({ "opacity" : 1.0, "left" : this.slideTarget + "px" }, 1000);
-        this.cancellor.animate({ "opacity" : "0.5" }, 1000);
+        // need to reset the container height to 'auto' temporarily then allow jQuery to modify it again
+        this.content_cont.html( content );
+        this.cont.show().css({"height":"auto"});
+        var height = $(window).height() > $(this.cont).outerHeight() ? $(window).height() : $(this.cont).outerHeight();
+        this.cont.css({ height : height }); 
+        this.cancellor.show().css({ height : height });
+        
+        if (this.options.animate===true) {
+          this.cont.animate({ "opacity" : 1.0, "left" : this.slideTarget + "px" }, this.options.animation_duration); 
+          this.cancellor.animate({ "opacity" : "0.5" }, this.options.animation_duration);
+          
+        } else {
+          this.cont.css({ left : this.slideTarget + "px" });
+          this.cancellor.css({ "opacity" : "0.5" });
+          
+        }
+        
         this.opened = true;
       } else {
         this.cont.html( content );
@@ -200,8 +212,17 @@
     },
     hidePage : function() {
       if (this.opened===true) {
-        this.cont.html( content ).animate({ "opacity" : 0.0, "left" : this.slideOrigin + "px" }, 1000);
-        this.cancellor.animate({ "opacity" : "0.0" }, 1000);
+        this.content_cont.empty();
+        
+        if (this.options.animate===true) {
+          this.cont.animate({ "opacity" : 0.0, "left" : this.slideOrigin + "px" }, this.options.animation_duration, function(){ $(this).hide(); });
+          this.cancellor.animate({ "opacity" : 0.0 }, this.options.animation_duration, function(){ $(this).hide(); });
+          
+        } else {
+          this.cont.css({ "opacity" : 0.0, "left" : this.slideOrigin + "px" });
+          this.cancellor.css({ "opacity" : 0.0 });
+          
+        }
         this.opened = false;
       }
     },
